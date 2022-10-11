@@ -3,11 +3,16 @@ uuid = "2f04bb67-2625-497f-843a-ef19b45d8291"
 authors = ["Henrik Wolf <henrik-wolf@freenet.de> and contributors"]
 version = "0.1.0"
 
+[deps]
+GeoInterface = "cf35fbd7-0cd7-5166-be24-54bfbe79505f"
+PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
+
 [compat]
 julia = "1.8"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+ArchGDAL = "c9ce4bd3-c3d5-55b8-8973-c0e20141b8c3"
 
 [targets]
 test = ["Test"]

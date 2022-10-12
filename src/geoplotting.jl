@@ -11,7 +11,7 @@ function _draw!(fig, ::PointTrait, geometry; kwargs...)
     elseif seriestype === :marker
         flm.CircleMarker((lat, lon); kwargs...).add_to(fig.obj)
     else
-        @error "seriestype of $seriestype for is not implemented for points. Available types are: [:circle, :marker]"
+        throw(ArgumentError("seriestype of $seriestype for is not implemented for points. Available types are: [:circle, :marker]"))
     end
     return fig
 end

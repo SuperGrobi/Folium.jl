@@ -36,8 +36,11 @@ function Base.show(io::IO, mime::MIME"text/html", flmmap::FoliumMap)
     show(io, mime, flmmap.obj)
 end
 
+# this takes a list like: [(minlat, minlon), (maxlat, maxlon)]
+fit_bounds!(flmmap, bounds) = flmmap.obj.fit_bounds(bounds)
+
 export FoliumMap
-export draw, draw!
+export draw, draw!, fit_bounds!
 
 function get_layer_class(series_type)
     if series_type === :circle

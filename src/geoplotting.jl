@@ -28,14 +28,19 @@ function _draw!(fig, ::PolygonTrait, geometry; kwargs...)
     # sensible defaults...?
     fill = get(kwargs, :fill, true)
     fill_opacity = get(kwargs, :fill_opacity, 1.0)
+    stroke = get(kwargs, :stroke, false)
 
     outside = getgeom(geometry, 1)
     coords = getcoords(outside)
-    flm.Polygon(coords; kwargs..., fill=fill, fill_opacity=fill_opacity).add_to(fig.obj)
+    flm.Polygon(coords; kwargs..., fill=fill, fill_opacity=fill_opacity, stroke=stroke).add_to(fig.obj)
     if draw_internals
         for inner in Iterators.drop(getgeom(geometry), 1)
             coords = getcoords(inner)
-            flm.Polygon(coords; kwargs..., fill=fill, fill_opacity=fill_opacity, color="white").add_to(fig.obj)
+            flm.Polygon(coords; kwargs..., 
+                        fill=fill, 
+                        fill_opacity=fill_opacity, 
+                        fill_color="white", 
+                        stroke=stroke).add_to(fig.obj)
         end
     end
     return fig

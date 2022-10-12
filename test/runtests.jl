@@ -3,11 +3,11 @@ using Test
 using ArchGDAL
 
 @testset "Geometry Traits" begin
-    point = ArchGDAL.createpoint(1.0, 2.0)
-    point2 = ArchGDAL.createpoint(0.0, 0.5)
-    line = ArchGDAL.createlinestring([1.0, 2.0, 3.0], [0.0, 4.8, 2.9])
-    line2 = ArchGDAL.createlinestring([0.3, 2.5, 1.0], [0.3, 4.3, 3.6])
-    poly = ArchGDAL.fromWKT("POLYGON ((-5 -5,5 -5,5 5,-5 5,-5 -5),(-1.5 -2.5,3.5 -2.5,3.5 2.5,-1.5 2.5,-1.5 -2.5),(0.75 -36.25,1.25 -36.25,1.25 -35.75,0.75 -35.75,0.75 -36.25))")
+    point = ArchGDAL.createpoint(40.0, 2.0)
+    point2 = ArchGDAL.createpoint(20.0, 0.5)
+    line = ArchGDAL.createlinestring([1.0, 1.0, 1.0], [0.0, 4.8, 2.9])
+    line2 = ArchGDAL.createlinestring([0.3, 0.3, 0.3], [0.3, 4.3, 3.6])
+    poly = ArchGDAL.fromWKT("POLYGON ((-5 -5,5 -5,5 5,-5 5,-5 -5),(-1.5 -2.5,3.5 -2.5,3.5 2.5,-1.5 2.5,-1.5 -2.5),(0.75 -3.25,1.25 -3.25,1.25 -2.75,0.75 -2.75,0.75 -3.25))")
     poly2 = ArchGDAL.fromWKT("POLYGON ((0.0 -1.5,4.0 -1.5,4.0 5.5,0.0 5.5,0.0 -1.5))")
 
     multipoint = ArchGDAL.createmultipoint()
@@ -24,9 +24,10 @@ using ArchGDAL
     for i in [point, point2, line, line2, poly, poly2, multipoint, multiline, multipoly]
         ArchGDAL.addgeom!(collection, i)
     end
-    
+
+    println(collect(getgeom(line)))
 
     for i in [point, line, poly, multipoint, multiline, multipoly, collection]
-        draw(i)
+        display(draw(i))
     end
 end

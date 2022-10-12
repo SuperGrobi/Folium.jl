@@ -1,21 +1,49 @@
-# Single geometries
+getcoords(geo) = getcoords(geomtrait(geo), geo)
+getcoords(::LineStringTrait, geo) = [reverse(collect(getcoord(point))) for point in getgeom(geo)]
 
+# Single geometries
 function _draw!(fig, ::PointTrait, geometry; kwargs...)
-    
-    println("now plotting a Point")
+    seriestype = get(kwargs, :seriestype, :circle)
+    lon = getcoord(geometry, 1)
+    lat = getcoord(geometry, 2)
+    if seriestype === :circle
+        flm.Circle((lat, lon); kwargs...).add_to(fig.obj)
+    elseif seriestype === :marker
+        flm.CircleMarker((lat, lon); kwargs...).add_to(fig.obj)
+    else
+        @error "seriestype of $seriestype for is not implemented for points. Available types are: [:circle, :marker]"
+    end
+    return fig
 end
 
 function _draw!(fig, ::LineStringTrait, geometry; kwargs...)
-    println("now plotting a LineString")
+    coords = getcoords(geometry)
+    flm.PolyLine(coords; kwargs...).add_to(fig.obj)
+    return fig
 end
 
 function _draw!(fig, ::PolygonTrait, geometry; kwargs...)
-    println("now plotting a Polygon")
+    draw_internals = get(kwargs, :draw_internals, true)
+
+    # sensible defaults...?
+    fill = get(kwargs, :fill, true)
+    fill_opacity = get(kwargs, :fill_opacity, 1.0)
+
+    outside = getgeom(geometry, 1)
+    coords = getcoords(outside)
+    flm.Polygon(coords; kwargs..., fill=fill, fill_opacity=fill_opacity).add_to(fig.obj)
+    if draw_internals
+        for inner in Iterators.drop(getgeom(geometry), 1)
+            coords = getcoords(inner)
+            flm.Polygon(coords; kwargs..., fill=fill, fill_opacity=fill_opacity, color="white").add_to(fig.obj)
+        end
+    end
+    return fig
 end
 
 # AbstractGeometryCollectionTrait
+# TODO: how should we pass the seriestype down to the point drawers?
 function _draw!(fig, ::T, geometry; kwargs...) where {T<:AbstractGeometryCollectionTrait}
-    println("now plotting a GeometryCollection")
     for geo in getgeom(geometry)
         draw!(fig, geo; kwargs...)
     end

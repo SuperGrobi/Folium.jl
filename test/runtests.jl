@@ -28,6 +28,22 @@ using ArchGDAL
     println(collect(getgeom(line)))
 
     for i in [point, line, poly, multipoint, multiline, multipoly, collection]
-        display(draw(i))
+        draw(i)
+    end
+    display(draw([point, point2]))
+end
+
+@testset "Array based geometry" begin
+    plon = 40.0
+    plat = 2.0
+    linelon = [1.0, 1.0, 1.0] 
+    linelat = [0.0, 4.8, 2.9]
+    polylon = [0.0, 3.0, 3.0, 0.0, 0.0]
+    polylat = [0.0, 0.0, 5.0, 6.0, 0.0]
+    pointmap = draw(plon, plat, :circle)
+    linemap = draw(linelon, linelat, :line)
+    polymap = draw(polylon, polylat, :polygon)
+    for m in [pointmap, linemap, polymap]
+        display(m)
     end
 end

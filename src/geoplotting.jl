@@ -1,6 +1,7 @@
 # Single geometries
 
 function _draw!(fig, ::PointTrait, geometry; kwargs...)
+    
     println("now plotting a Point")
 end
 
@@ -12,22 +13,11 @@ function _draw!(fig, ::PolygonTrait, geometry; kwargs...)
     println("now plotting a Polygon")
 end
 
-# multi geometries of same kind
-
-function _draw!(fig, ::MultiPointTrait, geometry; kwargs...)
-    println("now plotting a MultiPoint")
-end
-
-function _draw!(fig, ::MultiLineStringTrait, geometry; kwargs...)
-    println("now plotting a MultiLineString")
-end
-
-function _draw!(fig, ::MultiPolygonTrait, geometry; kwargs...)
-    println("now plotting a MultiPolygon")
-end
-
-# multiple geometries, different kinds
-
-function _draw!(fig, ::GeometryCollectionTrait, geometry; kwargs...)
+# AbstractGeometryCollectionTrait
+function _draw!(fig, ::T, geometry; kwargs...) where {T<:AbstractGeometryCollectionTrait}
     println("now plotting a GeometryCollection")
+    for geo in getgeom(geometry)
+        draw!(fig, geo; kwargs...)
+    end
+    return fig
 end

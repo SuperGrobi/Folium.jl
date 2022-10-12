@@ -17,11 +17,12 @@ struct FoliumMap
     obj::PyObject
 end
 function FoliumMap(;kwargs...)
+    tiles = get(kwargs, :tiles, "CartoDB PositronNoLabels")
     if !haskey(kwargs, :location)
         # this might be very useless...
-        flmmap = flm.Map(;location=[0.0, 0.0], kwargs...)
+        flmmap = flm.Map(;location=[0.0, 0.0], kwargs..., tiles=tiles)
     else
-        flmmap = flm.Map(;kwargs...)
+        flmmap = flm.Map(;kwargs..., tiles=tiles)
     end
     return FoliumMap(flmmap)
 end

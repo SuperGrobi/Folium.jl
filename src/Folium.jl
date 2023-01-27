@@ -15,26 +15,37 @@ end
 ##############################################
 struct FoliumMap
     obj::PyObject
+    max_width::String
 end
-function FoliumMap(;kwargs...)
-    tiles = get(kwargs, :tiles, "CartoDB PositronNoLabels")
+
+function FoliumMap(; kwargs...)
+    kw = Dict(kwargs)
+    max_width = get(kw, :max_width, "1300px")
     if !haskey(kwargs, :location)
-        # this might be very useless...
-        flmmap = flm.Map(;location=[0.0, 0.0], kwargs..., tiles=tiles)
+        # this might be very useless...‚
+        flmmap = flm.Map(; location=[0.0, 0.0], tiles="CartoDB PositronNoLabels", kw...)
     else
-        flmmap = flm.Map(;kwargs..., tiles=tiles)
+        flmmap = flm.Map(; tiles="CartoDB PositronNoLabels", kw...)
     end
-    return FoliumMap(flmmap)
+    return FoliumMap(flmmap, string(max_width))
+end
+
+function splice_width(flmmap::FoliumMap)
+    mapstring = repr("text/html", flmmap.obj)
+    m = match(r"(100%)", mapstring)
+    ms = mapstring[1:m.offset-1] * "100%; max-width:$(flmmap.max_width)" * mapstring[m.offset+4:end]
+    return ms
 end
 
 # for nice plot in VS Codes
 function Base.show(io::IO, ::MIME"juliavscode/html", flmmap::FoliumMap)
-    write(io, repr("text/html", flmmap.obj))
+    Base.show(io, "text/html", flmmap)
 end
 
 # for nice plots everywhere else
 function Base.show(io::IO, mime::MIME"text/html", flmmap::FoliumMap)
-    show(io, mime, flmmap.obj)
+    ms = splice_width(flmmap)
+    write(io, ms)
 end
 
 # this takes a list like: [(minlat, minlon), (maxlat, maxlon)]
@@ -74,11 +85,7 @@ function draw!(fig::FoliumMap, geometry; kwargs...)
     return fig
 end
 
-function draw(geometry; figure_params=Dict(), kwargs...)
-    fig = FoliumMap(; figure_params...)
-    return draw!(fig, geometry; kwargs...)
-end
-
+draw!(fig) = fig
 
 function draw!(fig::FoliumMap, lon, lat, series_type::Symbol; kwargs...)
     layer_class = get_layer_class(series_type)
@@ -93,9 +100,10 @@ function draw!(fig::FoliumMap, lon, lat, series_type::Symbol; kwargs...)
     return fig
 end
 
-function draw(lon, lat, series_type::Symbol; figure_params=Dict(), kwargs...)
+function draw(args...; figure_params=Dict(), kwargs...)
+    @nospecialize
     fig = FoliumMap(; figure_params...)
-    return draw!(fig, lon, lat, series_type; kwargs...)
+    return draw!(fig, args...; kwargs...)
 end
 
 include("geoplotting.jl")

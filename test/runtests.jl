@@ -1,6 +1,7 @@
 using Folium
 using Test
 using ArchGDAL
+using GeoInterface
 
 @testset "Geometry Traits" begin
     point = ArchGDAL.createpoint(40.0, 2.0)
@@ -31,12 +32,13 @@ using ArchGDAL
         draw(i)
     end
     display(draw([point, point2]))
+    @test true
 end
 
 @testset "Array based geometry" begin
     plon = 40.0
     plat = 2.0
-    linelon = [1.0, 1.0, 1.0] 
+    linelon = [1.0, 1.0, 1.0]
     linelat = [0.0, 4.8, 2.9]
     polylon = [0.0, 3.0, 3.0, 0.0, 0.0]
     polylat = [0.0, 0.0, 5.0, 6.0, 0.0]
@@ -46,4 +48,10 @@ end
     for m in [pointmap, linemap, polymap]
         display(m)
     end
+    @test true
+end
+
+@testset "empty map" begin
+    display(draw())
+    @test true
 end

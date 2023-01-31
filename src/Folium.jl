@@ -85,7 +85,7 @@ function draw!(fig::FoliumMap, geometry; kwargs...)
     return fig
 end
 
-draw!(fig) = fig
+draw!(fig; kwargs...) = fig
 
 function draw!(fig::FoliumMap, lon, lat, series_type::Symbol; kwargs...)
     layer_class = get_layer_class(series_type)

@@ -21,12 +21,10 @@ end
 function FoliumMap(; kwargs...)
     kw = Dict(kwargs)
     max_width = get(kw, :max_width, "1300px")
-    if !haskey(kwargs, :location)
-        # this might be very useless...‚
-        flmmap = flm.Map(; location=[0.0, 0.0], tiles="CartoDB PositronNoLabels", kw...)
-    else
-        flmmap = flm.Map(; tiles="CartoDB PositronNoLabels", kw...)
+    if haskey(kw, :location)
+        kw[:location] = kw[:location] |> reverse
     end
+    flmmap = flm.Map(; tiles="CartoDB PositronNoLabels", kw...)
     return FoliumMap(flmmap, string(max_width))
 end
 
@@ -103,7 +101,14 @@ end
 function draw(args...; figure_params=Dict(), kwargs...)
     @nospecialize
     fig = FoliumMap(; figure_params...)
-    return draw!(fig, args...; kwargs...)
+    draw!(fig, args...; kwargs...)
+    if !haskey(figure_params, :location)
+        bounds = fig.obj.get_bounds()
+        if !any(isnothing, bounds)
+            fig.obj.fit_bounds(eachrow(bounds) |> collect)
+        end
+    end
+    return fig
 end
 
 include("geoplotting.jl")

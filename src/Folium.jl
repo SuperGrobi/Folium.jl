@@ -15,24 +15,17 @@ end
 ##############################################
 struct FoliumMap
     obj::PyObject
-    max_width::String
 end
 
 function FoliumMap(; kwargs...)
     kw = Dict(kwargs)
-    max_width = get(kw, :max_width, "1300px")
+    fig_params = Dict(i for i in kwargs if first(i) in [:width, :height, :ratio, :title, :figsize])
+    fig = flm.Figure(; fig_params...)
     if haskey(kw, :location)
         kw[:location] = kw[:location] |> reverse
     end
-    flmmap = flm.Map(; tiles="CartoDB PositronNoLabels", kw...)
-    return FoliumMap(flmmap, string(max_width))
-end
-
-function splice_width(flmmap::FoliumMap)
-    mapstring = repr("text/html", flmmap.obj)
-    m = match(r"(100%)", mapstring)
-    ms = mapstring[1:m.offset-1] * "100%; max-width:$(flmmap.max_width)" * mapstring[m.offset+4:end]
-    return ms
+    flmmap = flm.Map(; tiles="CartoDB PositronNoLabels", kw...).add_to(fig)
+    return FoliumMap(flmmap)
 end
 
 # for nice plot in VS Codes
@@ -42,8 +35,7 @@ end
 
 # for nice plots everywhere else
 function Base.show(io::IO, mime::MIME"text/html", flmmap::FoliumMap)
-    ms = splice_width(flmmap)
-    write(io, ms)
+    Base.show(io, mime, flmmap.obj)
 end
 
 # this takes a list like: [(minlat, minlon), (maxlat, maxlon)]

@@ -34,12 +34,16 @@ function FoliumMap(; kwargs...)
     return FoliumMap(flmmap)
 end
 
+"""
+
+    splice_background(flmmap::FoliumMap)
+
+very hacky way to set the background of the foliummap to white.
+"""
 function splice_background(flmmap::FoliumMap)
-    mapstring = repr("text/html", flmmap.obj)
-    return mapstring
-    m = match(r"(100%)", mapstring)
-    ms =  * mapstring[26:end]
-    return mapstring
+    ms = repr("text/html", flmmap.obj)
+    location = findfirst("folium-map&quot; ", ms)[end]
+    return ms[1:location] * "style=&quot;background: white;&quot;" * ms[location:end]
 end
 
 # for nice plot in VS Codes

@@ -34,6 +34,14 @@ function FoliumMap(; kwargs...)
     return FoliumMap(flmmap)
 end
 
+function splice_background(flmmap::FoliumMap)
+    mapstring = repr("text/html", flmmap.obj)
+    return mapstring
+    m = match(r"(100%)", mapstring)
+    ms =  * mapstring[26:end]
+    return mapstring
+end
+
 # for nice plot in VS Codes
 function Base.show(io::IO, ::MIME"juliavscode/html", flmmap::FoliumMap)
     Base.show(io, "text/html", flmmap)
@@ -41,7 +49,8 @@ end
 
 # for nice plots everywhere else
 function Base.show(io::IO, mime::MIME"text/html", flmmap::FoliumMap)
-    Base.show(io, mime, flmmap.obj)
+    ms = splice_background(flmmap)
+    write(io, ms)
 end
 
 # this takes a list like: [(minlat, minlon), (maxlat, maxlon)]

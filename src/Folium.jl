@@ -17,6 +17,12 @@ struct FoliumMap
     obj::PyObject
 end
 
+"""
+
+    FoliumMap(; kwargs...)
+    
+create a new wrapper around the python folium object with kwargs supplied to the figure as well as the map.
+"""
 function FoliumMap(; kwargs...)
     kw = Dict(kwargs)
     fig_params = Dict(i for i in kwargs if first(i) in [:width, :height, :ratio, :title, :figsize])

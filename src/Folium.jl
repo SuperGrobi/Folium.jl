@@ -105,7 +105,7 @@ function draw!(fig::FoliumMap, lon, lat, series_type::Symbol; kwargs...)
         fill = get(kwargs, :fill, true)
         fill_opacity = get(kwargs, :fill_opacity, 1.0)
     end
-    layer_class(collect(zip(lat, lon)); kwargs..., fill=fill, fill_opacity=fill_opacity).add_to(fig.obj)
+    layer_class(collect(zip(lat, lon)); fill=fill, fill_opacity=fill_opacity, kwargs...).add_to(fig.obj)
     return fig
 end
 

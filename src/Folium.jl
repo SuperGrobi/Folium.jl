@@ -108,16 +108,28 @@ process_colors(cmap::Nothing, colors::Real, clims) = process_colors(default_colo
 process_colors(cmap, colors::Vector{<:Real}, clims) = _process_colors(cmap, colors, clims)
 process_colors(cmap::Nothing, colors::Vector{<:Real}, clims) = _process_colors(default_colorscheme(first(colors)), colors, clims)
 
+function trygetcmap(cmap)
+    try
+        return colorschemes[Symbol(cmap)]
+    catch e
+        if e isa KeyError
+            rethrow(ErrorException("The colorscheme with key $cmap does not exists. Possible options for that key are: \n$(findcolorscheme(string(cmap)))."))
+        else
+            rethrow(e)
+        end
+    end
+end
+
 function _process_colors(cmap, colors::Vector{<:Integer}, clims)
     if cmap isa Symbol || cmap isa String
-        cmap = colorschemes[Symbol(cmap)]
+        cmap = trygetcmap(cmap)
     end
     colors = cmap[mod1.(colors, length(cmap))]
     return Iterators.cycle("#" .* hex.(colors))
 end
 function _process_colors(cmap, colors::Vector{<:Real}, clims)
     if cmap isa Symbol || cmap isa String
-        cmap = colorschemes[Symbol(cmap)]
+        cmap = trygetcmap(cmap)
     end
     return Iterators.cycle("#" .* hex.(get(cmap, colors, clims)))
 end
@@ -197,7 +209,7 @@ function _draw!(fig::FoliumMap, lon, lat, series_type::Symbol; kwargs...)
     return fig
 end
 
-function draw_text!(fig::FoliumMap, text, lon, lat; angle=0.0, align=:left, fontsize=20)
+function draw_text!(fig::FoliumMap, text, lon, lat; angle=0.0, align=:left, align_vertical=:center, fontsize=20)
     angle *= -1
     if align == :left
         trans_x = "0%"
@@ -206,26 +218,37 @@ function draw_text!(fig::FoliumMap, text, lon, lat; angle=0.0, align=:left, font
     elseif align == :right
         trans_x = "100%"
     end
+    if align_vertical == :center
+        trans_y = "50%"
+    elseif align_vertical == :top
+        trans_y = "0%"
+    elseif align_vertical == :bottom
+        trans_y = "100%"
+    end
     icon = Folium.flm.features.DivIcon(icon_size=(250000, 36), icon_anchor=(0, 0),
         html="""<div style=
         "border-width: 5px;
         border-color: red;
         border-style: none; 
         font-size: $(fontsize)px;
-        transform-origin: $trans_x 50%;
+        transform-origin: $trans_x $trans_y;
         text-align: $align;
-        transform: translate(-$trans_x, -50%) rotate($(angle)deg);">$text</div>""")
+        transform: translate(-$trans_x, -$trans_y) rotate($(angle)deg);">$text</div>""")
     marker = Folium.flm.Marker((lat, lon), icon=icon).add_to(fig.obj)
     return fig
 end
 
-function draw_colorbar!(fig::FoliumMap, title, colors; cmap=nothing, clims=extrema(colors), label_pad=1.0, tick_angle=0.0)
+function draw_colorbar!(fig::FoliumMap, title, colors; cmap=nothing, clims=extrema(colors), label_pad=1.0, tick_angle=0.0, margin_bottom=0.1, margin_top=0.1)
     label_pad *= 360 / (2π * 6371)
     bounds = fig.obj.get_bounds()
     padding = 0.001
     width = 0.003
     top = bounds[2, 1]
     bottom = bounds[1, 1]
+    height = top - bottom
+    bottom += height * margin_bottom
+    top -= height * margin_top
+
     right_edge = bounds[2, 2] + padding
     map_resolution = 100
     colors = first(process_colors(cmap, range(clims..., map_resolution) |> collect, clims), map_resolution)
@@ -239,7 +262,7 @@ function draw_colorbar!(fig::FoliumMap, title, colors; cmap=nothing, clims=extre
         draw_text!(fig, round(v, digits=2), right_edge + padding + width, vy, angle=tick_angle)
     end
 
-    draw_text!(fig, title, right_edge + 2padding + width + label_pad, (top + bottom) / 2; angle=90, align=:center, fontsize=30)
+    draw_text!(fig, title, right_edge + 2padding + width + label_pad, (top + bottom) / 2; angle=90, align=:center, align_vertical=:top, fontsize=30)
     return fig
 end
 

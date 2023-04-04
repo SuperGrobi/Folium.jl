@@ -155,10 +155,9 @@ function draw!(fig::FoliumMap, args...; kwargs...)
         end
     catch e
         if e isa MethodError
-            tooltip = Iterators.cycle(tooltip)
+            tooltip = Iterators.cycle([tooltip])
         else
-            rethrow
-            e
+            rethrow(e)
         end
     end
     _draw!(fig, args...; kwargs..., tooltip=tooltip, colors=colors)

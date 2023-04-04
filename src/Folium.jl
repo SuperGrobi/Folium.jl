@@ -206,7 +206,7 @@ function draw_text!(fig::FoliumMap, text, lon, lat; angle=0.0, align=:left, font
     elseif align == :right
         trans_x = "100%"
     end
-    icon = Folium.flm.features.DivIcon(icon_size=(250, 36), icon_anchor=(0, 0),
+    icon = Folium.flm.features.DivIcon(icon_size=(250000, 36), icon_anchor=(0, 0),
         html="""<div style=
         "border-width: 5px;
         border-color: red;

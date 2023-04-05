@@ -17,12 +17,14 @@ function _draw!(fig, ::PointTrait, geometry; kwargs...)
 end
 
 function _draw!(fig, ::LineStringTrait, geometry; kwargs...)
+    GeoInterface.isempty(geometry) && return fig
     coords = getcoords(geometry)
     flm.PolyLine(coords; kwargs...).add_to(fig.obj)
     return fig
 end
 
 function _draw!(fig, ::PolygonTrait, geometry; kwargs...)
+    GeoInterface.isempty(geometry) && return fig
     draw_internals = get(kwargs, :draw_internals, true)
 
     # sensible defaults...?

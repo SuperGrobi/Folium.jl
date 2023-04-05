@@ -163,7 +163,7 @@ function draw!(fig::FoliumMap, args...; kwargs...)
     _draw!(fig, args...; kwargs..., tooltip=tooltip, colors=colors)
 end
 
-function draw(args...; figure_params=Dict(), kwargs...)
+function draw(args...; figure_params=(height=1000,), kwargs...)
     @nospecialize
     fig = FoliumMap(; figure_params...)
     draw!(fig, args...; kwargs...)

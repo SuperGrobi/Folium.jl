@@ -60,7 +60,10 @@ function Base.show(io::IO, mime::MIME"text/html", flmmap::FoliumMap)
 end
 
 # this takes a list like: [(minlat, minlon), (maxlat, maxlon)]
-fit_bounds!(flmmap, bounds) = flmmap.obj.fit_bounds(bounds)
+function fit_bounds!(flmmap, bounds=collect(eachrow(flmmap.obj.get_bounds())))
+    flmmap.obj.fit_bounds(bounds)
+    return flmmap
+end
 
 export FoliumMap
 export draw, draw!, fit_bounds!, draw_colorbar!

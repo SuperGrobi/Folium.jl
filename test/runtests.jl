@@ -1,9 +1,9 @@
-using Folium
-using Test
-using ArchGDAL
-using GeoInterface
+using TestItemRunner
 
-@testset "Geometry Traits" begin
+@run_package_tests verbose = true
+
+@testitem "Geometry Traits" begin
+    using ArchGDAL, GeoInterface
     point = ArchGDAL.createpoint(40.0, 2.0)
     point2 = ArchGDAL.createpoint(20.0, 0.5)
     line = ArchGDAL.createlinestring([1.0, 1.0, 1.0], [0.0, 4.8, 2.9])
@@ -35,7 +35,7 @@ using GeoInterface
     @test true
 end
 
-@testset "Array based geometry" begin
+@testitem "Array based geometry" begin
     plon = 40.0
     plat = 2.0
     linelon = [1.0, 1.0, 1.0]
@@ -51,7 +51,7 @@ end
     @test true
 end
 
-@testset "empty map" begin
+@testitem "empty map" begin
     display(draw())
     @test true
 end

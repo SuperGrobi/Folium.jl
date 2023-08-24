@@ -17,7 +17,6 @@ Colors = "0.12"
 GeoInterface = "1"
 PyCall = "1"
 TestItems = "0.1"
-jColorSchemes = "3"
 julia = "1.9"
 
 [extras]

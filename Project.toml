@@ -12,6 +12,7 @@ TestItems = "1c621080-faea-4a02-84b6-bbd5e436b8fe"
 
 [compat]
 ArchGDAL = "0.10"
+ColorSchemes = "3"
 Colors = "0.12"
 GeoInterface = "1"
 PyCall = "1"

@@ -36,6 +36,19 @@ function FoliumMap(; kwargs...)
     return FoliumMap(flmmap)
 end
 
+# stuff to work with current global map
+mutable struct CurrentMap
+    nullablemap::Union{FoliumMap,Nothing}
+end
+const CURRENT_MAP = CurrentMap(nothing)
+ismapnull() = isnothing(CURRENT_MAP.nullablemap)
+function current_map()
+    ismapnull() && error("No current Folium Map")
+    CURRENT_MAP.nullablemap
+end
+current_map(map::FoliumMap) = (CURRENT_MAP.nullablemap = map)
+
+
 """
 
     splice_background(flmmap::FoliumMap)
@@ -60,7 +73,10 @@ function Base.show(io::IO, mime::MIME"text/html", flmmap::FoliumMap)
 end
 
 # this takes a list like: [(minlat, minlon), (maxlat, maxlon)]
-fit_bounds!(flmmap, bounds) = flmmap.obj.fit_bounds(bounds)
+function fit_bounds!(flmmap=current_map(), bounds=collect(eachrow(flmmap.obj.get_bounds())))
+    flmmap.obj.fit_bounds(bounds)
+    return flmmap
+end
 
 export FoliumMap
 export draw, draw!, fit_bounds!, draw_colorbar!
@@ -137,8 +153,12 @@ end
 # passthrough, if we just pass the figure, dont change anything
 draw!(fig::FoliumMap; kwargs...) = fig
 
+# if we draw without a figure, get current figure and draw with that one
+draw!(args...; kwargs...) = draw!(current_map(), args...; kwargs...)
+
 # main entry point for all mutating draws. Calls _draw with cleaned up arguments
 function draw!(fig::FoliumMap, args...; kwargs...)
+    current_map(fig)
     #= leaflet has various color attributes:
     - color: color of stroke
     - fill_color: color of the fill (defaults to color)
@@ -166,6 +186,7 @@ end
 function draw(args...; figure_params=(height=1000,), kwargs...)
     @nospecialize
     fig = FoliumMap(; figure_params...)
+    current_map(fig)
     draw!(fig, args...; kwargs...)
     if !haskey(figure_params, :location)
         bounds = fig.obj.get_bounds()
